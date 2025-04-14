@@ -5,7 +5,8 @@
 #include <time.h>
 
 int sortWord(char *wordbank[]);
-void Game(char *wordbank[],int animalrand, char *animal);
+void printword(char *animal, char *gamearray);
+int Game(char *wordbank[], char *animal, char *gamearray);
 void menu(char *animal);
 int main()
 {
@@ -19,11 +20,11 @@ int main()
         "filhote de elefante", "bicho preguica", "tartaruga", "pinguim", "crocodilo", "periquito"
     };
     int animalrand = sortWord(wordbank);
-    char animal[30];
+    char animal[30], gamearray[30];
     strcpy(animal, wordbank[animalrand]);
     menu(animal);
-    //printf("o animal sorteado foi %s \n", animal);
-    printGame(wordbank, animalrand, animal);
+    printf("o animal sorteado foi %s \n", animal);
+    Game(wordbank, animal, gamearray);
 }
 int sortWord(char *wordbank[])
 {
@@ -35,21 +36,45 @@ int sortWord(char *wordbank[])
 
     return sorted;
 }
-void Game(char *wordbank[],int animalrand, char *animal)
+int Game(char *wordbank[], char *animal, char *gamearray)
 {
-    int letra;
-    prinf("Digite uma letra: \n")
-    scanf("%c", &letra);
+    char letra; //letra escolhida pelo usuario
+    int loops = 0; //para o entrar no if só quando checar a palavra inteira
+    printf("Digite uma letra: \n");
     letra = tolower(letra);
-    int i;
-    char comp = 'a'
-    for(i = 0; i < 25; i++)
+    int tentativas = 0, j, i, k, found = 0; //found = check se achou alguma letra igual, tentativas = se a letra for invalida
+    for(j = 0; j < strlen(animal); j++)
     {
-        if(letra == (comp + i))
+        if(animal[k] == ' ')
         {
-            //termino depois
+            gamearray[k] = ' ';
+        }
+        gamearray[j] = '_';
+    }
+    while(tentativas < 6)
+    {
+        fflush(stdin);
+        while ((getchar()) != '\n'); // limpa o buffer manualmente
+        for(i = 0; i < strlen(animal); i++)
+        {
+            if(letra == animal[i])
+            {
+                gamearray[i] = letra;
+                found = 1;
+            }
+            loops++;
+            if(loops == strlen(animal) && found != 0)
+            {
+                tentativas++;
+            }
+        }
+
+        for(k = 0; k < strlen(animal); k++)
+        {
+            printf(" %c", gamearray[k]);
         }
     }
+
 }
 void menu(char *animal)
 {
