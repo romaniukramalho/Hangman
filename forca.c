@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include <time.h>
 
-void printword(char *animal, char *gamearray);
-int Game(char *wordbank[], char *animal, char *gamearray);
+void printword(char *animal, char *gamearray, int *vidas, char *usedletras);
+void Game(char *wordbank[], char *animal, char *gamearray, int *vidas, int *numletras, char *usedletras);
 void menu(char *animal);
-int win(int erradas, char *animal, char *gamearray);
+int win(char *animal, char *gamearray);
 int main()
 {
     char *wordbank[] =  //banco de 34 palavras disponiveis no jogo da forca//
@@ -22,10 +22,10 @@ int main()
     srand(time(NULL));
     int sorted;
     sorted = (rand() % 34) + 1;
-    char animal[30], gamearray[30];
+    char animal[30], gamearray[30], usedletras[26];
     strcpy(animal, wordbank[sorted]); //copia o animal sorteado pra uma string
     strcpy(gamearray, animal); //copia o animal para o gamearray tbm
-    int i, x;
+    int i, vidas = 6, numletras = 0;
     for(i = 0; i < strlen(animal); i++) //aqui o gamearray recebe tudo de "_"
     {
         if(animal[i] == ' ')
@@ -38,37 +38,59 @@ int main()
         }
     }
     menu(animal);
-    printf("o animal sorteado foi %s \n", animal);
-    while(!win(x, animal, gamearray))
+    //printf("o animal sorteado foi %s \n", animal);
+
+    while(!win(animal, gamearray) && vidas != 0)
     {
-        x = Game(wordbank, animal, gamearray);
-        printword(animal, gamearray);
+        Game(wordbank, animal, gamearray, &vidas, &numletras, usedletras);
+        printword(animal, gamearray, &vidas, usedletras);
+    }
+    if(strcmp(animal, gamearray) == 0)
+    {
+        printf("Varabens voce ganhou");
+    }
+    else
+    {
+        printf("Voce perdeu, a palavra era %s", animal);
     }
 }
 
-int Game(char *wordbank[], char *animal, char *gamearray)
+void Game(char *wordbank[], char *animal, char *gamearray, int *vidas, int *numletras, char *usedletras)
 {
     char letra;  //letra escaneada e gamearray é o animal só que só de "_"
+    int i, verify = 0, x = 0;
     printf("Chute uma letra\n");
-    fflush(stdin);
-    scanf("%c", &letra);
+    scanf(" %c", &letra);
     letra = tolower(letra); //garantir q a letra ta em minusculo
-    int i, verify = 0, erradas = 0;
-    for(i = 0; i < strlen(animal); i++)
+    for(i = 0; i < *numletras; i++)
     {
-        if(animal[i] == letra)
+        if(usedletras[i] == letra)
         {
-            gamearray[i] = letra;
-            verify++;
+            x = 1;
         }
     }
-    if(verify = 0)
+    if(x == 1)
     {
-        erradas++;
-        printf("%d", verify);
-        verify = 0;
+        
     }
-    return erradas;
+
+    else
+    {
+        usedletras[*numletras] = letra;
+        (*numletras)++;
+        for(i = 0; i < strlen(animal); i++)
+        {
+            if(animal[i] == letra)
+            {
+                gamearray[i] = letra;
+                verify = 1;
+            }
+        }
+        if(verify == 0)
+        {
+            (*vidas)--;
+        }
+    }
 }
     
 void menu(char *animal)
@@ -81,6 +103,7 @@ void menu(char *animal)
     system("clear");
 
     int i;
+    printf(" +---+\n |   |\n     |\n     |\n     |\n     |\n\n");
     for(i = 0; i < strlen(animal); i++)
     {
         if(animal[i] == ' ')
@@ -92,21 +115,96 @@ void menu(char *animal)
     printf("\n");
 }
 
-void printword(char *animal, char* gamearray)
+void printword(char *animal, char* gamearray, int *vidas, char *usedletras)
 {
-    //system("clear");
+    system("clear");
     int i;
+    if(*vidas == 6)
+    {
+        printf(" +---+\n");
+        printf(" |   |\n");
+        printf("     |\n");
+        printf("     |\n");
+        printf("     |\n");
+        printf("     |\n");
+        printf("\n");
+    }
+    if(*vidas == 5)
+    {
+        printf(" +---+\n");
+        printf(" |   |\n");
+        printf(" O   |\n");
+        printf("     |\n");
+        printf("     |\n");
+        printf("     |\n");
+        printf("\n");
+    }
+    if(*vidas == 4)
+    {
+        printf(" +---+\n");
+        printf(" |   |\n");
+        printf(" O   |\n");
+        printf(" |   |\n");
+        printf("     |\n");
+        printf("     |\n");
+        printf("\n");
+    }
+    if(*vidas == 3)
+    {
+        printf(" +---+\n");
+        printf(" |   |\n");
+        printf(" O   |\n");
+        printf("/|   |\n");
+        printf("     |\n");
+        printf("     |\n");
+        printf("\n");
+    }
+    if(*vidas == 2)
+    {
+        printf(" +---+\n");
+        printf(" |   |\n");
+        printf(" O   |\n");
+        printf("/|\\  |\n");
+        printf("     |\n");
+        printf("     |\n");
+        printf("\n");
+    }
+    if(*vidas == 1)
+    {
+        printf(" +---+\n");
+        printf(" |   |\n");
+        printf(" O   |\n");
+        printf("/|\\  |\n");
+        printf("/    |\n");
+        printf("     |\n");
+        printf("\n");
+    }
+    if(*vidas == 0)
+    {
+        printf(" +---+\n");
+        printf(" |   |\n");
+        printf(" O   |\n");
+        printf("/|\\  |\n");
+        printf("/ \\  |\n");
+        printf("     |\n");
+        printf("\n");
+    }
     for(i = 0; i < strlen(gamearray); i++)
     {
         printf("%c ", gamearray[i]);
     }
+    printf("\n");
+    printf("Letras usadas: %s\n", usedletras);
 }
 
-int win(int x, char *animal, char* gamearray)
+int win(char *animal, char *gamearray)
 {
-    while(x < 5 || strcmp(animal, gamearray) != 0)
+    for (int i = 0; i < strlen(animal); i++) 
     {
-        return 0;
+        if (gamearray[i] != animal[i])
+        {
+            return 0; //quebra o loop, não deixando ganhar
+        }
     }
-    return 1;
+    return 1; //ganhou
 }
